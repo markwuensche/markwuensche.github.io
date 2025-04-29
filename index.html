@@ -1,14 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <title>Time vs. Space Perception - Brain Viewer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #0b0c10;
+            color: #c5c6c7;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+        }
+        header {
+            margin-top: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        iframe {
+            margin-top: 20px;
+            width: 95%;
+            height: 80vh;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+        footer {
+            margin: 20px;
+            font-size: 1rem;
+        }
+    </style>
   <meta charset="UTF-8">
   <title>Time and Space Perception - Interactive Brain Viewer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
   <style>
+    /* Background Animation */
     body {
       margin: 0;
       padding: 0;
@@ -33,27 +64,27 @@
       font-weight: bold;
       text-align: center;
     }
-    #brain-plot {
+    iframe {
       margin-top: 20px;
       width: 95%;
       height: 80vh;
+      border: none;
       border-radius: 12px;
       box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
     }
     .button-container {
       margin-top: 20px;
     }
-    .button-container button {
+    .button-container a {
+      text-decoration: none;
       padding: 10px 20px;
       background-color: #45a29e;
       color: #fff;
-      border: none;
       border-radius: 8px;
-      font-size: 1.1rem;
-      cursor: pointer;
       transition: background-color 0.3s;
+      font-size: 1.1rem;
     }
-    .button-container button:hover {
+    .button-container a:hover {
       background-color: #66fcf1;
     }
     footer {
@@ -66,103 +97,21 @@
 </head>
 
 <body>
+    <header>Time and Space Perception - Interactive Brain Viewer</header>
   <header>Time and Space Perception - Interactive Brain Viewer</header>
 
-  <div id="brain-plot"></div>
+  <iframe src="interactive_3D_brain_mobile.html"></iframe>
 
+    <iframe src="interactive_3D_brain_mobile.html"></iframe>
   <div class="button-container">
-    <button onclick="downloadBrain()">📥 Download This Brain View</button>
+    <a href="roi_combined_fixed.png" download>📥 Download Brain Image</a>
   </div>
 
+    <footer>Part of the PhD Project on Time and Space Experience and Perception</footer>
   <footer>
     Atlas Data: Harvard-Oxford Atlas, distributed via FSL (CC-BY-NC 3.0).<br>
-    Viewer generated using Nilearn and Plotly (BSD Licence).<br>
+    Viewer generated using Nilearn (BSD Licence).<br>
     Part of the PhD project on Time and Space Experience and Perception.
   </footer>
-
-  <script>
-    // Simulate loading your real exported voxel data
-    // (replace with a real data import later if needed)
-
-    // Example based on structure of brain_voxel_data_real.npz:
-    // x = array of x coordinates
-    // y = array of y coordinates
-    // z = array of z coordinates
-    // roi_ids = ROI numbers for color
-    // roi_labels = labels like MOG, SPL etc.
-
-    // Fake data example for now:
-    const x = [], y = [], z = [], roi_ids = [], roi_labels = [];
-
-    // Simulate about 2000 voxels across ROIs
-    for (let i = 0; i < 2000; i++) {
-      x.push(Math.random() * 91);   // MNI brain ~91 voxels wide
-      y.push(Math.random() * 109);
-      z.push(Math.random() * 91);
-      const region = Math.floor(Math.random() * 14) + 1;
-      roi_ids.push(region);
-      // Assign dummy ROI names
-      if (region <= 2) roi_labels.push("MOG (Visual)");
-      else if (region <= 4) roi_labels.push("SPL (Attention)");
-      else if (region <= 6) roi_labels.push("SMA (Motor)");
-      else if (region <= 8) roi_labels.push("SFG (Executive)");
-      else if (region <= 10) roi_labels.push("Insula (Salience)");
-      else if (region <= 12) roi_labels.push("IFG (Language)");
-      else roi_labels.push("Posterior Cingulum (Executive)");
-    }
-
-    const colorscale = [
-      [0.0, 'rgb(128,0,128)'],    // Visual (purple)
-      [0.2, 'rgb(0,153,0)'],      // Attention (green)
-      [0.4, 'rgb(204,0,0)'],      // Motor (red)
-      [0.6, 'rgb(51,153,255)'],   // Executive (sky blue)
-      [0.8, 'rgb(255,140,0)'],    // Salience (orange)
-      [1.0, 'rgb(255,255,0)']     // Language (yellow)
-    ];
-
-    const trace = {
-      type: 'scatter3d',
-      mode: 'markers',
-      x: x,
-      y: y,
-      z: z,
-      text: roi_labels,
-      marker: {
-        size: 1.5,
-        color: roi_ids,
-        colorscale: colorscale,
-        opacity: 0.8,
-        colorbar: {
-          title: 'Brain Regions',
-          tickvals: [1,3,5,7,9,11,13],
-          ticktext: ['Visual', 'Attention', 'Motor', 'Executive', 'Salience', 'Language', 'Executive 2']
-        }
-      },
-      hoverinfo: 'text'
-    };
-
-    const layout = {
-      scene: {
-        bgcolor: '#0b0c10',
-        xaxis: { visible: false },
-        yaxis: { visible: false },
-        zaxis: { visible: false }
-      },
-      margin: { l: 0, r: 0, b: 0, t: 0 },
-      paper_bgcolor: '#0b0c10',
-    };
-
-    Plotly.newPlot('brain-plot', [trace], layout);
-
-    function downloadBrain() {
-      html2canvas(document.getElementById('brain-plot')).then(function(canvas) {
-        const link = document.createElement('a');
-        link.download = 'brain_view.png';
-        link.href = canvas.toDataURL();
-        link.click();
-      });
-    }
-  </script>
-
 </body>
 </html>
