@@ -5,7 +5,7 @@
   <title>Time and Space Perception - Interactive Brain Viewer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- html2canvas for capturing screenshots -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <style>
@@ -33,18 +33,12 @@
       font-weight: bold;
       text-align: center;
     }
-    #iframe-container {
+    #brain-plot {
       margin-top: 20px;
       width: 95%;
       height: 80vh;
       border-radius: 12px;
-      overflow: hidden;
       box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-    }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
     }
     .button-container {
       margin-top: 20px;
@@ -74,12 +68,10 @@
 <body>
   <header>Time and Space Perception - Interactive Brain Viewer</header>
 
-  <div id="iframe-container">
-    <iframe id="brain-iframe" src="interactive_3D_brain_mobile.html"></iframe>
-  </div>
+  <div id="brain-plot"></div>
 
   <div class="button-container">
-    <button onclick="captureBrain()">📥 Download This Brain View</button>
+    <button onclick="downloadBrain()">📥 Download This Brain View</button>
   </div>
 
   <footer>
@@ -89,22 +81,81 @@
   </footer>
 
   <script>
-    function captureBrain() {
-      const iframe = document.getElementById('brain-iframe');
-      html2canvas(iframe, {
-        useCORS: true,
-        backgroundColor: null,
-        scale: 2,
-        windowWidth: iframe.clientWidth,
-        windowHeight: iframe.clientHeight
-      }).then(canvas => {
-        // Create a download link
+    // Brain viewer simulation
+    const x = [], y = [], z = [], value = [], text = [];
+
+    // Simulated brain volume (small cube for performance)
+    for (let xi = 0; xi <= 30; xi++) {
+      for (let yi = 0; yi <= 30; yi++) {
+        for (let zi = 0; zi <= 30; zi++) {
+          x.push(xi);
+          y.push(yi);
+          z.push(zi);
+          if (xi < 10) {
+            value.push(1); text.push("MOG (Visual)");
+          } else if (xi < 15) {
+            value.push(2); text.push("SPL (Attention)");
+          } else if (xi < 20) {
+            value.push(3); text.push("PRE-SMA / SMA (Motor)");
+          } else if (xi < 25) {
+            value.push(4); text.push("SFG (Executive)");
+          } else {
+            value.push(5); text.push("Insula (Salience)");
+          }
+        }
+      }
+    }
+
+    // Custom colorscale matching your functions
+    const colorscale = [
+      [0.0, 'rgb(128,0,128)'],    // MOG (Visual) - Purple
+      [0.2, 'rgb(0,153,0)'],      // SPL (Attention) - Green
+      [0.4, 'rgb(204,0,0)'],      // PRE-SMA (Motor) - Red
+      [0.6, 'rgb(51,153,255)'],   // SFG (Executive) - Sky Blue
+      [0.8, 'rgb(255,140,0)'],    // Insula (Salience) - Orange
+      [1.0, 'rgb(255,255,0)']     // Backup Yellow (Language if needed)
+    ];
+
+    const trace = {
+      type: 'scatter3d',
+      mode: 'markers',
+      x: x,
+      y: y,
+      z: z,
+      text: text,
+      marker: {
+        size: 2,
+        color: value,
+        colorscale: colorscale,
+        colorbar: {
+          title: 'Regions',
+          tickvals: [1,2,3,4,5],
+          ticktext: ['Visual', 'Attention', 'Motor', 'Executive', 'Salience']
+        },
+        opacity: 0.7
+      },
+      hoverinfo: 'text'
+    };
+
+    const layout = {
+      scene: {
+        bgcolor: '#0b0c10',
+        xaxis: { visible: false },
+        yaxis: { visible: false },
+        zaxis: { visible: false }
+      },
+      margin: { l: 0, r: 0, b: 0, t: 0 },
+      paper_bgcolor: '#0b0c10',
+    };
+
+    Plotly.newPlot('brain-plot', [trace], layout);
+
+    function downloadBrain() {
+      html2canvas(document.getElementById('brain-plot')).then(function(canvas) {
         const link = document.createElement('a');
         link.download = 'brain_view.png';
-        link.href = canvas.toDataURL('image/png');
+        link.href = canvas.toDataURL();
         link.click();
-      }).catch(function (error) {
-        alert("Screenshot failed: " + error);
       });
     }
   </script>
