@@ -4,8 +4,11 @@
   <meta charset="UTF-8">
   <title>Time and Space Perception - Interactive Brain Viewer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- html2canvas for capturing screenshots -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
   <style>
-    /* Background Animation */
     body {
       margin: 0;
       padding: 0;
@@ -30,27 +33,33 @@
       font-weight: bold;
       text-align: center;
     }
-    iframe {
+    #iframe-container {
       margin-top: 20px;
       width: 95%;
       height: 80vh;
-      border: none;
       border-radius: 12px;
+      overflow: hidden;
       box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
     }
     .button-container {
       margin-top: 20px;
     }
-    .button-container a {
-      text-decoration: none;
+    .button-container button {
       padding: 10px 20px;
       background-color: #45a29e;
       color: #fff;
+      border: none;
       border-radius: 8px;
-      transition: background-color 0.3s;
       font-size: 1.1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
     }
-    .button-container a:hover {
+    .button-container button:hover {
       background-color: #66fcf1;
     }
     footer {
@@ -65,16 +74,40 @@
 <body>
   <header>Time and Space Perception - Interactive Brain Viewer</header>
 
-  <iframe src="interactive_3D_brain_mobile.html"></iframe>
+  <div id="iframe-container">
+    <iframe id="brain-iframe" src="interactive_3D_brain_mobile.html"></iframe>
+  </div>
 
   <div class="button-container">
-    <a href="roi_combined_fixed.png" download>📥 Download Brain Image</a>
+    <button onclick="captureBrain()">📥 Download This Brain View</button>
   </div>
 
   <footer>
     Atlas Data: Harvard-Oxford Atlas, distributed via FSL (CC-BY-NC 3.0).<br>
-    Viewer generated using Nilearn (BSD Licence).<br>
+    Viewer generated using Nilearn and Plotly (BSD Licence).<br>
     Part of the PhD project on Time and Space Experience and Perception.
   </footer>
+
+  <script>
+    function captureBrain() {
+      const iframe = document.getElementById('brain-iframe');
+      html2canvas(iframe, {
+        useCORS: true,
+        backgroundColor: null,
+        scale: 2,
+        windowWidth: iframe.clientWidth,
+        windowHeight: iframe.clientHeight
+      }).then(canvas => {
+        // Create a download link
+        const link = document.createElement('a');
+        link.download = 'brain_view.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }).catch(function (error) {
+        alert("Screenshot failed: " + error);
+      });
+    }
+  </script>
+
 </body>
 </html>
